@@ -146,8 +146,8 @@ if (!token) {
       "  Never paste the token into chat, config.json or a commit.",
   );
 }
-if (token.includes(".")) {
-  fail("That looks like a bot token. A user-account token has no dots.");
+if (/\s/.test(token)) {
+  fail("That token contains whitespace — copy it again with no line breaks.");
 }
 
 const client = new Client({ checkUpdate: false });

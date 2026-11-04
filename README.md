@@ -23,6 +23,8 @@ Copy `.env.example` to `.env` and fill in your own token:
 DISCORD_TOKEN=your_token_here
 ```
 
+Modern account tokens contain dots (`xxx.yyy.zzz`) — that's normal, paste the whole string.
+
 `.env` is gitignored. Don't paste the token anywhere else (not in `config.json`, not in chat,
 not in a screenshot).
 
