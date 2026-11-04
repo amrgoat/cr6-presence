@@ -1,0 +1,14 @@
+{
+  "_comment": "Fill applicationId, pfp and button.url. Token goes in .env, never here. See README.md.",
+  "applicationId": "",
+  "name": "CR6",
+  "details": "Almost A Legend Call Me CR6",
+  "state": "❄️",
+  "pfp": "",
+  "button": {
+    "label": "❄️ Add me",
+    "url": ""
+  },
+  "showTimer": true,
+  "status": "online"
+}
