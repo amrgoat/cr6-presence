@@ -43,9 +43,13 @@ Right-click your avatar in Discord → **Copy Image Link**, then:
 "pfp": "https://cdn.discordapp.com/avatars/....png"
 ```
 
-Discord-hosted URLs are converted to `mp:` proxy links automatically; any other https image is
-resolved through Discord's external-asset proxy at startup. You can also drop in an Art Asset
-key from your app.
+At startup the image is registered with your application through Discord's external-assets
+endpoint — that registration is what produces an `mp:external/…` path the client will actually
+render. The console prints `Avatar registered with Discord: …` on success, or the reason it
+failed. The image has to be publicly reachable over https.
+
+Alternatively upload it under your app's **Rich Presence → Art Assets** and use the asset key
+(`"pfp": "myart"`) — no registration needed, and the most reliable option.
 
 ## 4. Your friend link
 
@@ -93,8 +97,9 @@ npm run dry-run
 
 ## Notes
 
-- **Buttons are hidden from your own account.** Check them from an alt or hover yourself in a
-  voice channel.
+- **Buttons are only visible to other people.** Discord's own docs say you cannot see buttons
+  on your own Rich Presence. If the label looks like plain text to you, check your profile from
+  an alt account before assuming it is broken.
 - **Button labels are plain text** — Discord usually drops the ❄️ from the label, which is why
   ❄️ also sits in `state`, where it does render.
 - The activity is re-sent on every reconnect, so a dropped WiFi or sleep cycle recovers by

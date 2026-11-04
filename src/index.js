@@ -112,19 +112,34 @@ function buildPresence(client, cfg) {
   return presence;
 }
 
-async function resolveExternalPfp(client, cfg, presence) {
-  if (!cfg.pfp || presence.assets?.largeImage) return;
-  if (!/^https?:\/\//i.test(cfg.pfp)) return;
+// Ask Discord to ingest an image URL for our application. Only images Discord
+// has registered get an "mp:external/…" path that the client will render.
+async function registerImage(client, cfg, url) {
+  const res = await RichPresence.getExternal(client, cfg.applicationId, url);
+  const entry = Array.isArray(res) ? res[0] : (res?.urls?.[0] ?? res);
+  return entry?.external_asset_path ?? null;
+}
+
+async function resolvePfp(client, cfg, presence) {
+  if (!cfg.pfp) return log("No pfp set — the card has no icon.");
+
+  // A bare asset key (uploaded in the Developer Portal) needs no resolution.
+  if (!/^https?:\/\//i.test(cfg.pfp)) {
+    return log(`Avatar: uploaded app asset "${cfg.pfp}".`);
+  }
 
   try {
-    const [asset] = await RichPresence.getExternal(client, cfg.applicationId, cfg.pfp);
-    if (asset?.external_asset_path) {
-      presence.setAssetsLargeImage(asset.external_asset_path);
-      log("Resolved external avatar through Discord's image proxy.");
+    const path = await registerImage(client, cfg, cfg.pfp);
+    if (path) {
+      presence.setAssetsLargeImage(path);
+      return log(`Avatar registered with Discord: ${path}`);
     }
+    log("Discord returned no asset path for the avatar — using the unregistered link.");
   } catch (err) {
-    log(`Could not resolve external avatar (${err.message}) — using no icon.`);
+    log(`Could not register the avatar (${err.message}) — using the unregistered link.`);
   }
+
+  log(`Avatar sent as: ${presence.toJSON()?.large_image ?? "none"}`);
 }
 
 const cfg = loadConfig();
@@ -154,7 +169,7 @@ const client = new Client({ checkUpdate: false });
 
 client.on("ready", async () => {
   const presence = buildPresence(client, cfg);
-  await resolveExternalPfp(client, cfg, presence);
+  await resolvePfp(client, cfg, presence);
 
   try {
     client.user.setPresence({ activities: [presence], status: cfg.status });
