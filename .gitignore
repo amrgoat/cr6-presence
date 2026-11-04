@@ -1,0 +1,7 @@
+node_modules/
+npm-debug.log*
+*.local
+
+# Your account token lives here — never commit it.
+.env
+token.txt
