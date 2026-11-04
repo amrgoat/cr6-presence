@@ -1,0 +1,18 @@
+{
+  "name": "cr6-presence",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Discord selfbot Rich Presence: Almost A Legend Call Me CR6",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dry-run": "node src/index.js --dry-run"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "discord.js-selfbot-v13": "^3.7.1"
+  }
+}
