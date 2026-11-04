@@ -10,6 +10,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const CONFIG_PATH = join(ROOT, "config.json");
 const DRY_RUN = process.argv.includes("--dry-run");
 const STATUSES = ["online", "idle", "dnd", "invisible"];
+// Discord activity types: what the card says before your name.
+const PRESENCE_TYPES = { playing: 0, listening: 2, watching: 3, competing: 5 };
 
 const log = (...args) => console.log("•", ...args);
 
@@ -39,7 +41,8 @@ function loadConfig() {
     buttonLabel: String(raw.button?.label ?? "❄️ Add me").trim(),
     buttonUrl: String(process.env.FRIEND_LINK ?? raw.button?.url ?? "").trim(),
     showTimer: raw.showTimer !== false,
-    status: String(raw.status ?? "online").trim(),
+    status: String(process.env.STATUS ?? raw.status ?? "online").trim().toLowerCase(),
+    type: String(process.env.TYPE ?? raw.type ?? "playing").trim().toLowerCase(),
   };
 
   if (!/^\d{17,20}$/.test(cfg.applicationId)) {
@@ -59,6 +62,9 @@ function loadConfig() {
   if (cfg.name.length > 128 || cfg.details.length > 128) fail("name/details must be ≤128 chars.");
   if (cfg.state.length > 128) fail("state must be 128 characters or fewer.");
   if (!STATUSES.includes(cfg.status)) fail(`config.status must be one of: ${STATUSES.join(", ")}.`);
+  if (!(cfg.type in PRESENCE_TYPES)) {
+    fail(`config.type must be one of: ${Object.keys(PRESENCE_TYPES).join(", ")}.`);
+  }
   if (!cfg.pfp) log("config.pfp is empty — the card will show without an icon.");
 
   return cfg;
@@ -85,7 +91,7 @@ function loadToken() {
 
 function buildPresence(client, cfg) {
   const presence = new RichPresence(client)
-    .setType(0) // Playing
+    .setType(PRESENCE_TYPES[cfg.type])
     .setName(cfg.name)
     .setDetails(cfg.details)
     .setApplicationId(cfg.applicationId)
@@ -153,7 +159,9 @@ client.on("ready", async () => {
   try {
     client.user.setPresence({ activities: [presence], status: cfg.status });
     log(`Logged in as ${client.user.tag} — presence is live.`);
-    log(`"${cfg.name}" / "${cfg.details}" / ${cfg.state || "no state"} / button → ${cfg.buttonUrl}`);
+    log(
+      `${cfg.type} "${cfg.name}" / "${cfg.details}" / ${cfg.state || "no state"} / ${cfg.status} / button → ${cfg.buttonUrl}`,
+    );
   } catch (err) {
     console.error(`✖ Could not set presence: ${err.message}`);
   }

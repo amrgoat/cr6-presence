@@ -73,7 +73,15 @@ Keep the process alive. `Ctrl+C` logs out cleanly.
 | `pfp` | Avatar URL or asset key for the big image |
 | `button.label` / `button.url` | The one button (max 2; label ≤ 32 chars) |
 | `showTimer` | `true` adds an elapsed timer |
-| `status` | `online` / `idle` / `dnd` / `invisible` |
+| `type` | `playing` / `watching` / `listening` / `competing` — the verb before your name |
+| `status` | `online` / `idle` / `dnd` / `invisible` — the dot next to your avatar |
+
+For example, to show up as *Watching* while idle:
+
+```json
+"type": "watching",
+"status": "idle"
+```
 
 Check everything without logging in:
 

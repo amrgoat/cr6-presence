@@ -10,5 +10,6 @@
     "url": ""
   },
   "showTimer": true,
+  "type": "playing",
   "status": "online"
 }
